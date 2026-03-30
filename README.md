@@ -3,6 +3,8 @@
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+[中文](README_CN.md) | English
+
 Control your entire home from Claude. No app, no dashboard, no Home Assistant. Just talk.
 
 Smart home control is fragmented... every brand has its own app, its own automations, its own walled garden. Smart Home MCP goes direct: MCP to device APIs, no middleware. Clone, add credentials, and your AI assistant becomes your home controller.
