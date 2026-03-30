@@ -12,3 +12,4 @@ wheels/
 # Secrets and cache
 .env
 device_cache.json
+home.yaml
