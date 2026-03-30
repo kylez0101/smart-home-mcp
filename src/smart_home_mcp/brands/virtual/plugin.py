@@ -94,8 +94,17 @@ class VirtualPlugin(BrandPlugin):
             ),
         ]
 
-    def _state_str(self, state: DeviceState) -> str:
-        return _format(state.capabilities)
+    def _control_result(self, device_id: str, capability: str, value) -> str:
+        """Control a device and return structured before/after result."""
+        try:
+            changes, state = self._store.control_with_diff(device_id, capability, value)
+            result = {
+                "changes": changes,
+                "state": state.capabilities,
+            }
+            return _format(result)
+        except Exception as e:
+            return f"Error: {e}"
 
     def _list_devices(self) -> str:
         devices = self._store.list_devices()
@@ -107,55 +116,30 @@ class VirtualPlugin(BrandPlugin):
 
     def _get_status(self, device_id: str = "") -> str:
         try:
-            return self._state_str(self._store.get_state(device_id))
+            state = self._store.get_state(device_id)
+            device = self._store.get_device(device_id)
+            result = {"device": device.name, "state": state.capabilities}
+            return _format(result)
         except Exception as e:
             return f"Error: {e}"
 
     def _turn_on(self, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "power", True)
-            return f"Device turned ON.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "power", True)
 
     def _turn_off(self, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "power", False)
-            return f"Device turned OFF.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "power", False)
 
     def _set_temperature(self, temperature: float, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "temperature", temperature)
-            return f"Temperature set to {temperature}°C.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "temperature", temperature)
 
     def _set_mode(self, mode: str, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "mode", mode)
-            return f"Mode set to {mode}.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "mode", mode)
 
     def _set_fan_speed(self, speed: str, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "fan_speed", speed)
-            return f"Fan speed set to {speed}.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "fan_speed", speed)
 
     def _set_brightness(self, brightness: int, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "brightness", brightness)
-            return f"Brightness set to {brightness}.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "brightness", brightness)
 
     def _set_position(self, position: int, device_id: str = "") -> str:
-        try:
-            state = self._store.control(device_id, "position", position)
-            return f"Position set to {position}.\n{self._state_str(state)}"
-        except Exception as e:
-            return f"Error: {e}"
+        return self._control_result(device_id, "position", position)

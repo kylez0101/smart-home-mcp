@@ -172,6 +172,24 @@ class MideaACPlugin(BrandPlugin):
         except Exception as e:
             return f"Error discovering devices: {e}"
 
+    def _with_diff(self, device_id: str, capability: str, action_fn, *args) -> str:
+        """Run an action and return structured before/after result."""
+        try:
+            before = self._manager.get_status(device_id)
+            old_value = before.get(capability)
+            after = action_fn(*args)
+            result = {
+                "changes": {
+                    "capability": capability,
+                    "before": old_value,
+                    "after": after.get(capability),
+                },
+                "state": after,
+            }
+            return _format(result)
+        except Exception as e:
+            return f"Error: {e}"
+
     def _get_ac_status(self, device_id: str = "") -> str:
         try:
             status = self._manager.get_status(device_id)
@@ -180,39 +198,24 @@ class MideaACPlugin(BrandPlugin):
             return f"Error getting status: {e}"
 
     def _turn_on(self, device_id: str = "") -> str:
-        try:
-            status = self._manager.turn_on(device_id)
-            return f"AC turned ON.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error turning on: {e}"
+        return self._with_diff(device_id, "power",
+                               self._manager.turn_on, device_id)
 
     def _turn_off(self, device_id: str = "") -> str:
-        try:
-            status = self._manager.turn_off(device_id)
-            return f"AC turned OFF.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error turning off: {e}"
+        return self._with_diff(device_id, "power",
+                               self._manager.turn_off, device_id)
 
     def _set_temperature(self, temperature: float, device_id: str = "") -> str:
-        try:
-            status = self._manager.set_temperature(temperature, device_id)
-            return f"Temperature set to {temperature}°C.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error setting temperature: {e}"
+        return self._with_diff(device_id, "target_temperature",
+                               self._manager.set_temperature, temperature, device_id)
 
     def _set_mode(self, mode: str, device_id: str = "") -> str:
-        try:
-            status = self._manager.set_mode(mode, device_id)
-            return f"Mode set to {mode}.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error setting mode: {e}"
+        return self._with_diff(device_id, "mode",
+                               self._manager.set_mode, mode, device_id)
 
     def _set_fan_speed(self, speed: str, device_id: str = "") -> str:
-        try:
-            status = self._manager.set_fan_speed(speed, device_id)
-            return f"Fan speed set to {speed}.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error setting fan speed: {e}"
+        return self._with_diff(device_id, "fan_speed",
+                               self._manager.set_fan_speed, speed, device_id)
 
     def _set_swing(
         self,
@@ -221,23 +224,21 @@ class MideaACPlugin(BrandPlugin):
         device_id: str = "",
     ) -> str:
         try:
-            status = self._manager.set_swing(vertical, horizontal, device_id)
-            return f"Swing updated.\nCurrent status:\n{_format(status)}"
+            before = self._manager.get_status(device_id)
+            after = self._manager.set_swing(vertical, horizontal, device_id)
+            changes = {}
+            if vertical is not None:
+                changes["vertical_swing"] = {"before": before.get("vertical_swing"), "after": after.get("vertical_swing")}
+            if horizontal is not None:
+                changes["horizontal_swing"] = {"before": before.get("horizontal_swing"), "after": after.get("horizontal_swing")}
+            return _format({"changes": changes, "state": after})
         except Exception as e:
-            return f"Error setting swing: {e}"
+            return f"Error: {e}"
 
     def _set_eco_mode(self, enabled: bool, device_id: str = "") -> str:
-        try:
-            status = self._manager.set_eco_mode(enabled, device_id)
-            state = "enabled" if enabled else "disabled"
-            return f"Eco mode {state}.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error setting eco mode: {e}"
+        return self._with_diff(device_id, "eco_mode",
+                               self._manager.set_eco_mode, enabled, device_id)
 
     def _set_turbo(self, enabled: bool, device_id: str = "") -> str:
-        try:
-            status = self._manager.set_turbo(enabled, device_id)
-            state = "enabled" if enabled else "disabled"
-            return f"Turbo mode {state}.\nCurrent status:\n{_format(status)}"
-        except Exception as e:
-            return f"Error setting turbo mode: {e}"
+        return self._with_diff(device_id, "turbo",
+                               self._manager.set_turbo, enabled, device_id)

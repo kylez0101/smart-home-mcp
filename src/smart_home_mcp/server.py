@@ -13,7 +13,17 @@ _LOGGER = logging.getLogger(__name__)
 
 mcp = FastMCP(
     "smart-home",
-    instructions="Control smart home devices from multiple brands.",
+    instructions="""\
+Control smart home devices from multiple brands.
+
+When reporting device changes to the user:
+- Be conversational and natural, not robotic.
+- Summarize what changed: "已把卧室空调从 28°C 调到 25°C" instead of dumping raw JSON.
+- Include relevant context like indoor/outdoor temperature difference when available.
+- For scenes, give a brief summary of what happened across all devices.
+- Match the user's language (respond in Chinese if they speak Chinese).
+- If a control action includes "changes" data, use it to describe what changed vs before.
+""",
 )
 
 _tool_registry: dict[str, Callable[..., Any]] = {}
@@ -84,8 +94,17 @@ def _control_device(device_id: str, capability: str, value: Any) -> str:
     if not plugin:
         return f"Error: Device '{device_id}' not found. Run list_devices to see available devices."
     try:
-        state = plugin.control(device_id, capability, value)
-        return f"Set {capability}={value} on {device_id}.\n{_fmt(state.capabilities)}"
+        before = plugin.get_state(device_id)
+        old_value = before.capabilities.get(capability)
+        after = plugin.control(device_id, capability, value)
+        result = {
+            "device_id": device_id,
+            "capability": capability,
+            "before": old_value,
+            "after": value,
+            "state": after.capabilities,
+        }
+        return _fmt(result)
     except Exception as e:
         return f"Error: {e}"
 

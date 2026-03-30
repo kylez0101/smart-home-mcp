@@ -61,3 +61,17 @@ class VirtualDeviceStore:
         validated = cap.validate(value)
         self._states[did][capability] = validated
         return self.get_state(did)
+
+    def control_with_diff(self, device_id: str, capability: str, value) -> tuple[dict, DeviceState]:
+        """Control and return (changes_dict, new_state). changes_dict has before/after."""
+        did = self._resolve_id(device_id)
+        device = self._devices[did]
+        old_value = self._states[did].get(capability)
+        new_state = self.control(device_id, capability, value)
+        changes = {
+            "device": device.name,
+            "capability": capability,
+            "before": old_value,
+            "after": new_state.capabilities.get(capability),
+        }
+        return changes, new_state
