@@ -1,0 +1,40 @@
+rooms:
+  bedroom:
+    display_name: "Master Bedroom"
+    devices:
+      - id: "virtual_ac_01"
+        brand: virtual
+        alias: "bedroom_ac"
+
+  living_room:
+    display_name: "Living Room"
+    devices:
+      - id: "virtual_light_01"
+        brand: virtual
+        alias: "living_light"
+      - id: "virtual_curtain_01"
+        brand: virtual
+        alias: "living_curtain"
+
+scenes:
+  sleep:
+    display_name: "Sleep Mode"
+    actions:
+      - alias: "bedroom_ac"
+        tool: "virtual_set_temperature"
+        params:
+          temperature: 26
+      - alias: "living_light"
+        tool: "virtual_turn_off"
+        params: {}
+
+  morning:
+    display_name: "Morning Mode"
+    actions:
+      - alias: "living_curtain"
+        tool: "virtual_set_position"
+        params:
+          position: 100
+      - alias: "living_light"
+        tool: "virtual_turn_on"
+        params: {}

@@ -7,8 +7,12 @@ from midea_beautiful.lan import LanDevice
 from midea_beautiful.scanner import do_find_appliances
 
 from .cloud_session import CloudSession
-from .config import MIDEA_ACCOUNT, MIDEA_PASSWORD
-from .device_cache import get_device, save_cache
+from smart_home_mcp.config import get_brand_config
+from smart_home_mcp.device_cache import get_device, save_cache
+
+_cfg = get_brand_config("MIDEA")
+MIDEA_ACCOUNT = _cfg.get("ACCOUNT", "")
+MIDEA_PASSWORD = _cfg.get("PASSWORD", "")
 
 _LOGGER = logging.getLogger(__name__)
 

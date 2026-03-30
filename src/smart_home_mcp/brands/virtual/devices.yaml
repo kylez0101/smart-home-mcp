@@ -1,0 +1,42 @@
+devices:
+  - id: "virtual_light_01"
+    name: "Virtual Living Room Light"
+    type: light
+    capabilities:
+      - {name: power, type: bool}
+      - {name: brightness, type: int, range: {min: 0, max: 100}}
+    initial_state:
+      power: false
+      brightness: 75
+
+  - id: "virtual_ac_01"
+    name: "Virtual Bedroom AC"
+    type: ac
+    capabilities:
+      - {name: power, type: bool}
+      - {name: temperature, type: float, range: {min: 16, max: 31, step: 0.5}}
+      - {name: mode, type: enum, options: [cool, heat, auto, dry, fan]}
+      - {name: fan_speed, type: enum, options: [auto, low, medium, high, full]}
+    initial_state:
+      power: false
+      temperature: 24
+      mode: "cool"
+      fan_speed: "auto"
+
+  - id: "virtual_curtain_01"
+    name: "Virtual Curtain"
+    type: curtain
+    capabilities:
+      - {name: position, type: int, range: {min: 0, max: 100}}
+    initial_state:
+      position: 0
+
+  - id: "virtual_sensor_01"
+    name: "Virtual Outdoor Sensor"
+    type: sensor
+    capabilities:
+      - {name: temperature, type: float, read_only: true}
+      - {name: humidity, type: float, read_only: true}
+    initial_state:
+      temperature: 28.5
+      humidity: 65.0
