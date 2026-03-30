@@ -44,12 +44,17 @@ You don't need to define scenes for everything. Claude reasons on the fly.
 
 ## Quick Start
 
-### Prerequisites
+### One-Line Install
 
-- Python 3.13+
-- [uv](https://docs.astral.sh/uv/) package manager
+Copy this to Claude Code or OpenClaw and it will set everything up for you:
 
-### Installation
+```
+Install the Smart Home MCP server from https://github.com/kylez0101/smart-home-mcp.git — clone the repo, run `uv sync`, and add it to my MCP config with command "uv" and args ["--directory", "<cloned-path>", "run", "python", "-m", "smart_home_mcp"]. Then help me configure my .env file with my device credentials.
+```
+
+### Manual Installation
+
+**Prerequisites:** Python 3.13+, [uv](https://docs.astral.sh/uv/)
 
 ```bash
 git clone https://github.com/kylez0101/smart-home-mcp.git
